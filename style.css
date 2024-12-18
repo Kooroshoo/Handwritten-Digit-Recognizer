@@ -1,8 +1,9 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
     padding: 20px;
     margin: 0;
     background-color: #f4f4f9;  /* Light background for the page */
+    color: #333;  /* Dark text color for better contrast */
 }
 
 /* Main container holding everything */
@@ -12,56 +13,220 @@ body {
     gap: 20px;  /* Space between columns */
     margin-top: 20px;
 }
-  
+
 /* Style for each box (div) */
 .box {
-    width: 32%;  /* Adjust the width to create spacing between boxes */
-    width: 400px;  /* Ensure each box has a minimum width */
+    width: 420px;  /* Ensure each box has a minimum width */
     border: 2px solid #ddd;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 12px;
     background-color: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    height: 400px;  /* Fixed height for each box */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    height: 420px;  /* Fixed height for each box */
     box-sizing: border-box;
     overflow: auto; /* Makes content scrollable when it overflows */
+    transition: transform 0.3s ease, box-shadow 0.3s ease-in-out;
 }
-  
+
+/* Hover effect for boxes */
+.box:hover {
+    transform: translateY(-5px);  /* Slight lift effect */
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);  /* Slightly more prominent shadow on hover */
+}
+
+/* Heading style */
 h3 {
     text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #444; /* Slightly lighter than the body text */
 }
-  
+
+/* Button style */
 button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #4CAF50;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 30px;
     cursor: pointer;
     font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-block;
+    margin: 5px;
 }
-  
+
+/* Modern hover effect for buttons */
 button:hover {
     background-color: #45a049;
+    transform: translateY(-2px); /* Button lifts slightly */
 }
-  
+
+button:active {
+    background-color: #388E3C;
+    transform: translateY(0); /* Button presses down when clicked */
+}
+
+button:focus {
+    outline: none;
+    box-shadow: 0 0 4px rgba(76, 175, 80, 0.6);
+}
+
+/* Centering buttons inside the training container */
+#training-container button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;  /* Set width of buttons to make them more compact */
+}
+
+/* Styling for the examples */
 #examples {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around;
     gap: 10px;
 }
-  
+
+/* Styling for canvas */
 canvas {
     border: 1px solid #ccc;
     margin: 4px;
+    border-radius: 8px;
+    background-color: #fff;
 }
 
-/* Set a fixed height for the children of the specified containers */
+/* General container for graphs */
 #training-graph-container > *,
 #accuracy-container > *,
 #confusion-container > * {
-    width: 100%;   /* Allow full width */
-    object-fit: contain; /* Ensures the content fits within the container */
-    box-sizing: border-box; /* Ensure padding and borders are included */
+    width: 100%;
+    object-fit: contain;  /* Ensures content fits within the container */
+    box-sizing: border-box;
 }
+
+/* Input field styling (Choose File input smaller) */
+input[type="file"] {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 60%;  /* Reduced width for file input */
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+input[type="file"]:hover {
+    border-color: #4CAF50;
+}
+
+input[type="file"]:focus {
+    border-color: #388E3C;
+    outline: none;
+}
+
+/* Clear Button styling */
+#clearButton {
+    background-color: #FF5722;
+    color: white;
+    border-radius: 30px;
+    padding: 10px 20px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+}
+
+/* Hover effect for clear button */
+#clearButton:hover {
+    background-color: #FF3D00;
+    transform: translateY(-2px);
+}
+
+#clearButton:active {
+    background-color: #F44336;
+    transform: translateY(0);
+}
+
+/* Prediction output text style */
+#prediction-output,
+#upload-prediction-output {
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 15px;
+    color: #333;
+}
+
+/* Style for the drawing canvas */
+#drawing-canvas {
+    border-radius: 8px;
+    background-color: #000;
+    border: 2px solid #ddd;
+}
+
+/* Style for upload container */
+#upload-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Container for the canvas drawing box */
+#drawing-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Footer styling */
+footer {
+    background-color: #333;  /* Dark background for the footer */
+    color: white;  /* White text */
+    text-align: center;  /* Center the text */
+    padding: 15px 0;  /* Padding for top and bottom */
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    margin-top: 20px;
+}
+
+footer a {
+    color: #4CAF50;  /* Green color for the link */
+    text-decoration: none;  /* Remove underline from the link */
+}
+
+footer a:hover {
+    text-decoration: underline;  /* Underline the link on hover */
+}
+
+/* Main Heading and Description */
+header {
+    text-align: center;
+    padding: 40px 0;  /* Padding around the heading section */
+    background-color: #ffffff;
+    border-bottom: 2px solid #ddd;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #333;  /* Dark text color for good contrast */
+    font-weight: 600;
+}
+
+header #description {
+    font-size: 1.2rem;
+    color: #555;  /* Slightly lighter text for description */
+    margin-top: 10px;
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+}
+

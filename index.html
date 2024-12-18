@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TensorFlow.js Tutorial</title>
+  <title>Handwritten Digit Recognizer</title>
   <link rel="stylesheet" href="style.css">
   <script src="tfjs-libs/tf.min.js"></script>
   <script src="tfjs-libs/tfjs-vis.umd.min.js"></script>
@@ -12,6 +12,12 @@
   <script src="script.js" type="module"></script>
 </head>
 <body>
+    <!-- Main Heading -->
+    <header>
+      <h1>Handwritten-Digit-Recognizer</h1>
+      <p id="description">This application allows you to train and test a machine learning model that can recognize handwritten digits. To use it, start by loading or training the model. Once the model is ready, you can either draw a digit or upload a photo to see the prediction.</p>
+    </header>
+
   <div class="container">
     <!-- Example Box -->
     <div class="box" id="examples-container">
@@ -28,13 +34,13 @@
     <div class="box" id="training-container">
       <h3>Model Training</h3>
       <button id="trainButton">Train Model</button>
+      <button id="loadButton">Load Model</button>
       <div id="status"></div>
       
       <!-- Container for the training graph -->
       <div id="training-graph-container"></div>
 
-      <!-- Load Model Button -->
-      <button id="loadButton">Load Model</button>
+
     </div>
 
     <!-- Accuracy Box -->
@@ -50,7 +56,7 @@
     <!-- Drawing Box -->
     <div class="box" id="drawing-container">
       <h3>Draw and Predict</h3>
-      <canvas id="drawing-canvas" width="280" height="280" style="border: 1px solid #ddd; background-color: rgb(0, 0, 0);"></canvas>
+      <canvas id="drawing-canvas" width="220" height="220" style="border: 1px solid #ddd; background-color: rgb(0, 0, 0);"></canvas>
       <button id="clearButton">Clear</button>
       <div id="prediction-output"></div>
     </div>
@@ -64,5 +70,10 @@
 
     
   </div>
+
+    <!-- Footer section -->
+    <footer>
+      <p>Made by <a href="https://github.com/Kooroshoo/Handwritten-Digit-Recognizer" target="_blank">Kooroshoo</a></p>
+    </footer>
 </body>
 </html>
