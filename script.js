@@ -272,7 +272,7 @@ async function run() {
 
   document.getElementById('loadButton').addEventListener('click', async () => {
     try {
-      const loadedModel = await tf.loadLayersModel('/model/my-model.json');
+      const loadedModel = await tf.loadLayersModel('./model/my-model.json');
       await showAccuracy(loadedModel, data);
       await showConfusion(loadedModel, data);
       initializeCanvas(loadedModel); // Initialize canvas after loading
