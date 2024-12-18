@@ -135,6 +135,125 @@ async function showConfusion(model, data) {
   labels.dispose();
 }
 
+function initializeCanvas(model) {
+  const canvas = document.getElementById('drawing-canvas');
+  const ctx = canvas.getContext('2d');
+  const predictionOutput = document.getElementById('prediction-output');
+  const clearButton = document.getElementById('clearButton');
+  const IMAGE_SIZE = 28;
+
+  // Set background to black
+  ctx.fillStyle = 'black'; // Fill the canvas with black color
+  ctx.fillRect(0, 0, canvas.width, canvas.height); // Fill the entire canvas
+
+  // Drawing logic
+  let isDrawing = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  canvas.addEventListener('mousedown', (event) => {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = event.clientX - rect.left;
+    lastY = event.clientY - rect.top;
+  });
+
+  canvas.addEventListener('mouseup', () => (isDrawing = false));
+  canvas.addEventListener('mousemove', draw);
+
+  function draw(event) {
+    if (!isDrawing) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    lastX = x;
+    lastY = y;
+  }
+
+  // Clear canvas logic
+  clearButton.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    predictionOutput.textContent = '';
+  });
+
+  // Predict logic
+  canvas.addEventListener('mouseup', async () => {
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  
+    const inputTensor = tf.tidy(() => {
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCanvas.width = IMAGE_SIZE;
+      tempCanvas.height = IMAGE_SIZE;
+  
+      // Resize the canvas content to 28x28
+      tempCtx.drawImage(canvas, 0, 0, IMAGE_SIZE, IMAGE_SIZE);
+  
+      // Get the resized image data and normalize it
+      const resizedImageData = tempCtx.getImageData(0, 0, IMAGE_SIZE, IMAGE_SIZE);
+      const tensor = tf.browser.fromPixels(resizedImageData, 1)
+        .toFloat()
+        .div(255.0) // Normalize pixel values
+        .reshape([1, IMAGE_SIZE, IMAGE_SIZE, 1]);
+  
+      console.log('Input Tensor:', tensor.arraySync()); // Debugging
+      return tensor;
+    });
+  
+    // Make prediction using the trained model
+    const prediction = model.predict(inputTensor);
+    prediction.print(); // Debugging predictions
+  
+    const predictedIndex = prediction.argMax(-1).dataSync()[0];
+    predictionOutput.textContent = `Prediction: ${predictedIndex} (${classNames[predictedIndex]})`;
+  
+    inputTensor.dispose();
+  });
+}
+
+// Upload and predict logic
+function handleImageUpload(model) {
+  const uploadInput = document.getElementById('uploadInput');
+  const uploadPredictionOutput = document.getElementById('upload-prediction-output');
+
+  uploadInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Create a file reader and load the image
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const imgElement = document.createElement('img');
+      imgElement.src = reader.result;
+      imgElement.onload = async () => {
+        // Prepare the image
+        const tensor = tf.browser.fromPixels(imgElement).toFloat().resizeNearestNeighbor([28, 28]).mean(2).expandDims(2).expandDims(0).div(255.0);
+        console.log('Input Tensor:', tensor.arraySync());
+
+        // Make a prediction
+        const prediction = model.predict(tensor);
+        const predictedIndex = prediction.argMax(-1).dataSync()[0];
+
+        uploadPredictionOutput.textContent = `Prediction: ${predictedIndex} (${classNames[predictedIndex]})`;
+
+        tensor.dispose();
+      };
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
 async function run() {
   const data = new MnistData();
   await data.load();
@@ -143,44 +262,23 @@ async function run() {
   const model = getModel();
   tfvis.show.modelSummary(document.getElementById('model-summary-container'), model);
 
-  // Training button event listener inside the 'training-container'
   document.getElementById('trainButton').addEventListener('click', async () => {
-    const statusDiv = document.getElementById('status');
-    statusDiv.textContent = 'Training started...';
-
-    // Start training the model and display status inside the training-container
     await train(model, data);
-
-    // Once training is complete, update status and show accuracy/confusion
-    statusDiv.textContent = 'Training complete.';
     await showAccuracy(model, data);
     await showConfusion(model, data);
-
-    // Allow downloading the trained model
-    const downloadButton = document.createElement('button');
-    downloadButton.textContent = 'Download Trained Model';
-    document.getElementById('training-container').appendChild(downloadButton);
-
-    downloadButton.addEventListener('click', async () => {
-      await model.save('downloads://my-model');
-      statusDiv.textContent = 'Model is saved and ready for download.';
-    });
+    initializeCanvas(model); // Initialize canvas after training
+    handleImageUpload(model); // Initialize image upload handler
   });
 
-  // Add event listener for loading the model from the root directory
   document.getElementById('loadButton').addEventListener('click', async () => {
-    const statusDiv = document.getElementById('status');
-    statusDiv.textContent = 'Loading model...';
-
     try {
       const loadedModel = await tf.loadLayersModel('/model/my-model.json');
-      statusDiv.textContent = 'Model loaded successfully!';
-
-      tfvis.show.modelSummary(document.getElementById('model-summary-container'), loadedModel);
       await showAccuracy(loadedModel, data);
       await showConfusion(loadedModel, data);
+      initializeCanvas(loadedModel); // Initialize canvas after loading
+      handleImageUpload(loadedModel); // Initialize image upload handler
     } catch (error) {
-      statusDiv.textContent = `Error loading model: ${error}`;
+      console.error('Error loading model:', error);
     }
   });
 }

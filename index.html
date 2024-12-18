@@ -46,6 +46,23 @@
     <div class="box" id="confusion-container">
       <h3>Confusion Matrix</h3>
     </div>
+
+    <!-- Drawing Box -->
+    <div class="box" id="drawing-container">
+      <h3>Draw and Predict</h3>
+      <canvas id="drawing-canvas" width="280" height="280" style="border: 1px solid #ddd; background-color: rgb(0, 0, 0);"></canvas>
+      <button id="clearButton">Clear</button>
+      <div id="prediction-output"></div>
+    </div>
+
+    <!-- Upload Box -->
+    <div class="box" id="upload-container">
+      <h3>Upload and Predict</h3>
+      <input type="file" id="uploadInput" accept="image/*">
+      <div id="upload-prediction-output"></div>
+    </div>
+
+    
   </div>
 </body>
 </html>
