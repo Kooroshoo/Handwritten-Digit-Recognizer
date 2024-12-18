@@ -6,15 +6,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TensorFlow.js Tutorial</title>
   <link rel="stylesheet" href="style.css">
-
   <script src="tfjs-libs/tf.min.js"></script>
   <script src="tfjs-libs/tfjs-vis.umd.min.js"></script>
   <script src="data.js" type="module"></script>
   <script src="script.js" type="module"></script>
 </head>
 <body>
-  <button id="trainButton">Train Model</button>
-  <button id="loadButton">Load Model</button>
-  <div id="status"></div>
+  <div class="container">
+    <!-- Example Box -->
+    <div class="box" id="examples-container">
+      <h3>Input Data Examples</h3>
+      <div id="examples"></div>
+    </div>
+
+    <!-- Model Architecture Box -->
+    <div class="box" id="model-summary-container">
+      <h3>Model Architecture</h3>
+    </div>
+
+    <!-- Training Box -->
+    <div class="box" id="training-container">
+      <h3>Model Training</h3>
+      <button id="trainButton">Train Model</button>
+      <div id="status"></div>
+      
+      <!-- Container for the training graph -->
+      <div id="training-graph-container"></div>
+
+      <!-- Load Model Button -->
+      <button id="loadButton">Load Model</button>
+    </div>
+
+    <!-- Accuracy Box -->
+    <div class="box" id="accuracy-container">
+      <h3>Accuracy</h3>
+    </div>
+
+    <!-- Confusion Matrix Box -->
+    <div class="box" id="confusion-container">
+      <h3>Confusion Matrix</h3>
+    </div>
+  </div>
 </body>
 </html>

@@ -1,18 +1,12 @@
 import { MnistData } from './data.js';
 
 async function showExamples(data) {
-  // Create a container in the visor
-  const surface =
-    tfvis.visor().surface({ name: 'Input Data Examples', tab: 'Input Data' });
-
-  // Get the examples
+  const examplesContainer = document.getElementById('examples');
   const examples = data.nextTestBatch(20);
   const numExamples = examples.xs.shape[0];
 
-  // Create a canvas element to render each example
   for (let i = 0; i < numExamples; i++) {
     const imageTensor = tf.tidy(() => {
-      // Reshape the image to 28x28 px
       return examples.xs
         .slice([i, 0], [1, examples.xs.shape[1]])
         .reshape([28, 28, 1]);
@@ -23,17 +17,14 @@ async function showExamples(data) {
     canvas.height = 28;
     canvas.style = 'margin: 4px;';
     await tf.browser.toPixels(imageTensor, canvas);
-    surface.drawArea.appendChild(canvas);
+    examplesContainer.appendChild(canvas);
 
     imageTensor.dispose();
   }
 }
 
-document.addEventListener('DOMContentLoaded', run);
-
 function getModel() {
   const model = tf.sequential();
-
   const IMAGE_WIDTH = 28;
   const IMAGE_HEIGHT = 28;
   const IMAGE_CHANNELS = 1;
@@ -48,7 +39,6 @@ function getModel() {
       kernelInitializer: 'varianceScaling',
     })
   );
-
   model.add(tf.layers.maxPooling2d({ poolSize: [2, 2], strides: [2, 2] }));
 
   model.add(
@@ -85,11 +75,7 @@ function getModel() {
 
 async function train(model, data) {
   const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
-  const container = {
-    name: 'Model Training',
-    tab: 'Model',
-    styles: { height: '1000px' },
-  };
+  const container = document.getElementById('training-graph-container'); // Graph container inside the training div
   const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
 
   const BATCH_SIZE = 512;
@@ -116,16 +102,7 @@ async function train(model, data) {
 }
 
 const classNames = [
-  'Zero',
-  'One',
-  'Two',
-  'Three',
-  'Four',
-  'Five',
-  'Six',
-  'Seven',
-  'Eight',
-  'Nine',
+  'Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'
 ];
 
 function doPrediction(model, data, testDataSize = 500) {
@@ -143,7 +120,7 @@ function doPrediction(model, data, testDataSize = 500) {
 async function showAccuracy(model, data) {
   const [preds, labels] = doPrediction(model, data);
   const classAccuracy = await tfvis.metrics.perClassAccuracy(labels, preds);
-  const container = { name: 'Accuracy', tab: 'Evaluation' };
+  const container = document.getElementById('accuracy-container');
   tfvis.show.perClassAccuracy(container, classAccuracy, classNames);
 
   labels.dispose();
@@ -152,7 +129,7 @@ async function showAccuracy(model, data) {
 async function showConfusion(model, data) {
   const [preds, labels] = doPrediction(model, data);
   const confusionMatrix = await tfvis.metrics.confusionMatrix(labels, preds);
-  const container = { name: 'Confusion Matrix', tab: 'Evaluation' };
+  const container = document.getElementById('confusion-container');
   tfvis.render.confusionMatrix(container, { values: confusionMatrix, tickLabels: classNames });
 
   labels.dispose();
@@ -162,33 +139,32 @@ async function run() {
   const data = new MnistData();
   await data.load();
   await showExamples(data);
-  const model = getModel();
-  tfvis.show.modelSummary({ name: 'Model Architecture', tab: 'Model' }, model);
 
-  // Attach the event listener for the train button
+  const model = getModel();
+  tfvis.show.modelSummary(document.getElementById('model-summary-container'), model);
+
+  // Training button event listener inside the 'training-container'
   document.getElementById('trainButton').addEventListener('click', async () => {
     const statusDiv = document.getElementById('status');
     statusDiv.textContent = 'Training started...';
 
-    // Start training the model
+    // Start training the model and display status inside the training-container
     await train(model, data);
 
-    // After training, show accuracy and confusion matrix
+    // Once training is complete, update status and show accuracy/confusion
+    statusDiv.textContent = 'Training complete.';
     await showAccuracy(model, data);
     await showConfusion(model, data);
 
     // Allow downloading the trained model
     const downloadButton = document.createElement('button');
     downloadButton.textContent = 'Download Trained Model';
-    document.body.appendChild(downloadButton);
+    document.getElementById('training-container').appendChild(downloadButton);
 
     downloadButton.addEventListener('click', async () => {
-      // Save the model and create a download link for it
       await model.save('downloads://my-model');
       statusDiv.textContent = 'Model is saved and ready for download.';
     });
-
-    statusDiv.textContent = 'Training complete.';
   });
 
   // Add event listener for loading the model from the root directory
@@ -197,18 +173,16 @@ async function run() {
     statusDiv.textContent = 'Loading model...';
 
     try {
-      // Load the model from the root directory
-      const model = await tf.loadLayersModel('/model/my-model.json');
+      const loadedModel = await tf.loadLayersModel('/model/my-model.json');
       statusDiv.textContent = 'Model loaded successfully!';
 
-      // Show model summary or any other operation you want
-      tfvis.show.modelSummary({ name: 'Loaded Model Architecture', tab: 'Model' }, model);
-
-      // Perform testing after loading the model
-      await showAccuracy(model, data);
-      await showConfusion(model, data);
+      tfvis.show.modelSummary(document.getElementById('model-summary-container'), loadedModel);
+      await showAccuracy(loadedModel, data);
+      await showConfusion(loadedModel, data);
     } catch (error) {
       statusDiv.textContent = `Error loading model: ${error}`;
     }
   });
 }
+
+document.addEventListener('DOMContentLoaded', run);
